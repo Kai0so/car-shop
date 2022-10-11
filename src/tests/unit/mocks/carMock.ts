@@ -1,3 +1,7 @@
+export const validCarId = '4edd40c86762e0fb12000003';
+export const invalidCarId = '5de0fb10g850003';
+export const notFoundId = '4edd40c86762e0fb12000012';
+
 export const createdCarMock = {
   _id: "4edd40c86762e0fb12000003",
   model: "Camaro",

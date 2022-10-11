@@ -2,9 +2,10 @@ import * as sinon from 'sinon';
 import chai from 'chai';
 const { expect } = chai;
 import CarModel from '../../../models/Car';
-import { carMock, createdCarMock, readAllMock } from '../mocks/carMock';
+import { carMock, createdCarMock, invalidCarId, notFoundId, readAllMock, validCarId } from '../mocks/carMock';
 import CarService from '../../../services/Car';
 import { ZodError } from 'zod';
+import { ErrorTypes } from '../../../errors/catalog';
 
 describe('Car Service', () => {
   const carModel = new CarModel();
@@ -41,14 +42,47 @@ describe('Car Service', () => {
       sinon.stub(carModel, 'read').resolves(readAllMock);
       const allCars = await carService.read();
       expect(allCars).to.be.deep.equal(readAllMock);
-      sinon.restore()
+      sinon.restore();
     });
 
     it('Quando não há carros cadastrados', async () => {
       sinon.stub(carModel, 'read').resolves([]);
       const allCars = await carService.read();
       expect(allCars).to.be.deep.equal([]);
-      sinon.restore()
+      sinon.restore();
+    });
+  })
+
+  describe('Listando um carro pelo id', () => {
+    it('Sucesso na listagem', async () => {
+      sinon.stub(carModel, 'readOne').resolves(createdCarMock);
+      const car = await carService.readOne(validCarId);
+      expect(car).to.be.deep.equal(createdCarMock);
+      sinon.restore();
+    });
+
+    it('Caso o id informado possua menos que 24 caracteres', async () => {
+      let error: any;
+      sinon.stub(carModel, 'readOne').resolves(null);
+      try {
+        await carService.readOne(invalidCarId);
+      } catch (err: any) {
+        error = err;
+      }
+      expect(error.message).to.be.deep.equal(ErrorTypes.InvalidMongoId);
+      sinon.restore();
+    });
+
+    it('Caso o id informado seja inválido', async () => {
+      let error: any;
+      sinon.stub(carModel, 'readOne').resolves(null);
+      try {
+        await carService.readOne(notFoundId);
+      } catch (err: any) {
+        error = err;
+      }
+      expect(error.message).to.be.deep.equal(ErrorTypes.EntityNotFound);
+      sinon.restore();
     });
   })
 });
