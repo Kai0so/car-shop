@@ -2,10 +2,11 @@ import * as sinon from 'sinon';
 import chai from 'chai';
 const { expect } = chai;
 import CarModel from '../../../models/Car';
-import { carMock, createdCarMock, invalidCarId, notFoundId, readAllMock, validCarId } from '../mocks/carMock';
+import { carMock, carMockUpdate, createdCarMock, invalidCarId, notFoundId, readAllMock, validCarId } from '../mocks/carMock';
 import CarService from '../../../services/Car';
 import { ZodError } from 'zod';
 import { ErrorTypes } from '../../../errors/catalog';
+import { ICar } from '../../../interfaces/ICar';
 
 describe('Car Service', () => {
   const carModel = new CarModel();
@@ -83,6 +84,47 @@ describe('Car Service', () => {
       }
       expect(error.message).to.be.deep.equal(ErrorTypes.EntityNotFound);
       sinon.restore();
+    });
+  })
+
+  describe('Atualizando um carro', () => {
+    it('Sucesso na atualização', async () => {
+      sinon.stub(carModel, 'update').resolves(carMockUpdate);
+      const updatedCar = await carService.update(validCarId, carMockUpdate);
+      expect(updatedCar).to.be.deep.equal(carMockUpdate);
+      sinon.restore();
+    });
+
+    it('Caso o id informado possua menos que 24 caracteres', async () => {
+      let error: any;
+      try {
+        await carService.update(invalidCarId, carMockUpdate);
+      } catch (err: any) {
+        error = err;
+      }
+      expect(error.message).to.be.deep.equal(ErrorTypes.InvalidMongoId);
+    });
+
+    it('Caso o id informado seja inválido', async () => {
+      let error: any;
+      sinon.stub(carModel, 'update').resolves(null);
+      try {
+        await carService.update(notFoundId, carMockUpdate);
+      } catch (err: any) {
+        error = err;
+      }
+      expect(error.message).to.be.deep.equal(ErrorTypes.EntityNotFound);
+      sinon.restore();
+    });
+
+    it('Falha na validação dos campos', async () => {
+      let err: any;
+      try {
+        await carService.update(validCarId, {} as ICar);
+      } catch (error) {
+        err = error;
+      }
+      expect(err).to.be.instanceOf(ZodError);
     });
   })
 });

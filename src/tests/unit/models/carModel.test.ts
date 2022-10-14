@@ -3,7 +3,7 @@ import chai from 'chai';
 import { Model } from 'mongoose';
 const { expect } = chai;
 import CarModel from '../../../models/Car';
-import { carMock, createdCarMock, invalidCarId, readAllMock, validCarId } from '../mocks/carMock';
+import { carMock, carMockUpdate, createdCarMock, invalidCarId, notFoundId, readAllMock, validCarId } from '../mocks/carMock';
 
 describe('Car Model', () => {
   const carModel = new CarModel();
@@ -50,6 +50,22 @@ describe('Car Model', () => {
       sinon.stub(Model, 'findById').resolves(null);
       const car = await carModel.readOne(invalidCarId);
       expect(car).to.be.deep.equal(null);
+      sinon.restore();
+    });
+  })
+
+  describe('Atualizando um carro', () => {
+    it('Sucesso na atualização', async () => {
+      sinon.stub(Model, 'findByIdAndUpdate').resolves(carMockUpdate);
+      const updatedCar = await carModel.update(validCarId, carMockUpdate);
+      expect(updatedCar).to.be.deep.equal(carMockUpdate);
+      sinon.restore();
+    });
+
+    it('Caso o id informado seja inválido', async () => {
+      sinon.stub(Model, 'findByIdAndUpdate').resolves(null);
+      const updatedCar = await carModel.update(notFoundId, carMockUpdate);
+      expect(updatedCar).to.be.deep.equal(null);
       sinon.restore();
     });
   })

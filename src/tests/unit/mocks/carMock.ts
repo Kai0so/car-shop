@@ -21,6 +21,15 @@ export const carMock = {
   seatsQty: 2,
 };
 
+export const carMockUpdate = {
+  model: 'Fusquinha Turbo',
+  year: 2022,
+  color: 'blue',
+  buyValue: 999999,
+  doorsQty: 2,
+  seatsQty: 4,
+}
+
 export const readAllMock = [
   {
     _id: "4edd40c86762e0fb12000003",

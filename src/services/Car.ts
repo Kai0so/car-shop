@@ -11,9 +11,7 @@ class CarService implements IService<ICar> {
 
   public async create(obj: unknown): Promise<ICar> {
     const parsed = CarZodSchema.safeParse(obj);
-    if (!parsed.success) {
-      throw parsed.error;
-    }
+    if (!parsed.success) throw parsed.error;
     return this._car.create(parsed.data);
   }
 
@@ -25,6 +23,15 @@ class CarService implements IService<ICar> {
   public async readOne(_id: string): Promise<ICar> {
     if (_id.length !== 24) throw new Error(ErrorTypes.InvalidMongoId);
     const car = await this._car.readOne(_id);
+    if (!car) throw new Error(ErrorTypes.EntityNotFound);
+    return car;
+  }
+
+  public async update(_id: string, obj: ICar): Promise<ICar> {
+    if (_id.length < 24) throw new Error(ErrorTypes.InvalidMongoId);
+    const parsed = CarZodSchema.safeParse(obj);
+    if (!parsed.success) throw parsed.error;
+    const car = await this._car.update(_id, parsed.data);
     if (!car) throw new Error(ErrorTypes.EntityNotFound);
     return car;
   }
