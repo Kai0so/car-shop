@@ -69,4 +69,20 @@ describe('Car Model', () => {
       sinon.restore();
     });
   })
+
+  describe('Excluindo um carro', () => {
+    it('Sucesso na exclusão', async () => {
+      sinon.stub(Model, 'findByIdAndDelete').resolves({});
+      const deletedCar = await carModel.delete(validCarId);
+      expect(deletedCar).to.be.deep.equal({});
+      sinon.restore();
+    });
+
+    it('Caso o id informado seja inválido', async () => {
+      sinon.stub(Model, 'findByIdAndDelete').resolves(null);
+      const deletedCar = await carModel.delete(notFoundId);
+      expect(deletedCar).to.be.deep.equal(null);
+      sinon.restore();
+    });
+  })
 });

@@ -127,4 +127,36 @@ describe('Car Service', () => {
       expect(err).to.be.instanceOf(ZodError);
     });
   })
+
+
+  describe('Excluindo um carro', () => {
+    it('Sucesso na exclusão', async () => {
+      sinon.stub(carModel, 'delete').resolves({} as ICar);
+      const deletedCar = await carService.delete(validCarId);
+      expect(deletedCar).to.be.deep.equal({});
+      sinon.restore();
+    });
+
+    it('Caso o id informado possua menos que 24 caracteres', async () => {
+      let error: any;
+      try {
+        await carService.delete(invalidCarId);
+      } catch (err: any) {
+        error = err;
+      }
+      expect(error.message).to.be.deep.equal(ErrorTypes.InvalidMongoId);
+    });
+
+    it('Caso o id informado seja inválido', async () => {
+      let error: any;
+      sinon.stub(carModel, 'delete').resolves(null);
+      try {
+        await carService.delete(notFoundId);
+      } catch (err: any) {
+        error = err;
+      }
+      expect(error.message).to.be.deep.equal(ErrorTypes.EntityNotFound);
+      sinon.restore();
+    });
+  })
 });

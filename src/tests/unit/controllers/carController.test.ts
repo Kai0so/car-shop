@@ -6,6 +6,7 @@ import { carMock, carMockUpdate, createdCarMock, invalidCarId, notFoundId, readA
 import CarService from '../../../services/Car';
 import CarController from '../../../controllers/Car';
 import { Request, Response } from 'express';
+import ICar from '../../../interfaces/CarZodSchema';
 
 describe('Car Controller', () => {
   const carModel = new CarModel();
@@ -69,6 +70,17 @@ describe('Car Controller', () => {
       await carController.update(req, res);
       expect((res.status as sinon.SinonStub).calledWith(200)).to.be.true;
       expect((res.json as sinon.SinonStub).calledWith(carMockUpdate)).to.be.true;
+      sinon.restore();
+    });
+  })
+
+  describe('Excluindo um carro', () => {
+    it('Sucesso na exclusão', async () => {
+      sinon.stub(carService, 'delete').resolves({} as ICar);
+      req.params = { id: validCarId };
+      await carController.delete(req, res);
+      expect((res.status as sinon.SinonStub).calledWith(204)).to.be.true;
+      expect((res.json as sinon.SinonStub).calledWith({})).to.be.true;
       sinon.restore();
     });
   })

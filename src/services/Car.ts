@@ -31,9 +31,16 @@ class CarService implements IService<ICar> {
     if (_id.length < 24) throw new Error(ErrorTypes.InvalidMongoId);
     const parsed = CarZodSchema.safeParse(obj);
     if (!parsed.success) throw parsed.error;
-    const car = await this._car.update(_id, parsed.data);
-    if (!car) throw new Error(ErrorTypes.EntityNotFound);
-    return car;
+    const updatedCar = await this._car.update(_id, parsed.data);
+    if (!updatedCar) throw new Error(ErrorTypes.EntityNotFound);
+    return updatedCar;
+  }
+
+  public async delete(_id: string): Promise<ICar> {
+    if (_id.length < 24) throw new Error(ErrorTypes.InvalidMongoId);
+    const deletedCar = await this._car.delete(_id);
+    if (!deletedCar) throw new Error(ErrorTypes.EntityNotFound);
+    return deletedCar;
   }
 }
 
